@@ -56,9 +56,10 @@ public class XpLoader implements IXposedHookLoadPackage {
             Process p = Runtime.getRuntime().exec(cmd);
             p.waitFor();
             BufferedReader bufrIn = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
-            String line = bufrIn.readLine().trim();
+            String line = bufrIn.readLine();
             bufrIn.close();
-            if (!line.isEmpty()) {
+            if (line != null && !line.isEmpty()) {
+                line = line.trim();
                 String[] sa = line.split(":");
                 String path = "";
                 if (sa.length > 1) {
@@ -77,20 +78,19 @@ public class XpLoader implements IXposedHookLoadPackage {
                 }
                 InputStream is = zf.getInputStream(ze);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-                String classNameEntry = reader.readLine().trim();
+                String classNameEntry = reader.readLine();
                 reader.close();
                 zf.close();
-                if (classNameEntry.isEmpty()) {
+                if (classNameEntry == null || classNameEntry.isEmpty()) {
                     Log.w(TAG, String.format("init class is empty in pkg path %s, ", path));
                     return;
                 }
                 //通过PathClassLoader 加载apk
+                classNameEntry = classNameEntry.trim();
                 final PathClassLoader pathClassLoader = new PathClassLoader(path, ClassLoader.getSystemClassLoader());
-                //通过反射调用 MainModule的 handleLoadPackage 方法【重点】
-                final Class<?> aClass;
                 try {
                     //反射调用插件的handleLoadPackage方法
-                    aClass = Class.forName(classNameEntry, true, pathClassLoader);
+                    final Class<?> aClass = Class.forName(classNameEntry, true, pathClassLoader);
                     final Method aClassMethod = aClass.getMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
                     aClassMethod.invoke(aClass.newInstance(), lpparam);
                 } catch (Exception e) {
