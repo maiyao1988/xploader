@@ -103,6 +103,7 @@ public class XpLoader implements IXposedHookLoadPackage {
             }
         }
         catch (Throwable e) {
+            Log.e(TAG, "xploader get exception:");
             Log.e(TAG, Log.getStackTraceString(e));
         }
     }
