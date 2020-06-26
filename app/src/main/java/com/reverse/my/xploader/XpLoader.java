@@ -57,6 +57,7 @@ public class XpLoader implements IXposedHookLoadPackage {
             p.waitFor();
             BufferedReader bufrIn = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
             String line = bufrIn.readLine().trim();
+            bufrIn.close();
             if (!line.isEmpty()) {
                 String[] sa = line.split(":");
                 String path = "";
@@ -75,7 +76,7 @@ public class XpLoader implements IXposedHookLoadPackage {
                     return;
                 }
                 InputStream is = zf.getInputStream(ze);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 String classNameEntry = reader.readLine().trim();
                 reader.close();
                 zf.close();
@@ -88,7 +89,7 @@ public class XpLoader implements IXposedHookLoadPackage {
                 //通过反射调用 MainModule的 handleLoadPackage 方法【重点】
                 final Class<?> aClass;
                 try {
-                    //反射调用MainModule的handleLoadPackage方法
+                    //反射调用插件的handleLoadPackage方法
                     aClass = Class.forName(classNameEntry, true, pathClassLoader);
                     final Method aClassMethod = aClass.getMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
                     aClassMethod.invoke(aClass.newInstance(), lpparam);
@@ -96,23 +97,6 @@ public class XpLoader implements IXposedHookLoadPackage {
                     Log.e(TAG, String.format("load %s error msg %s", path, e.getMessage()));
                     Log.e(TAG, Log.getStackTraceString(e));
                 }
-
-
-                /*
-                //通过PathClassLoader 加载apk
-                final PathClassLoader pathClassLoader = new PathClassLoader(path, ClassLoader.getSystemClassLoader());
-                String className = MainModule.class.getName();
-                //通过反射调用 MainModule的 handleLoadPackage 方法【重点】
-                final Class<?> aClass;
-                try {
-                    //反射调用MainModule的handleLoadPackage方法
-                    aClass = Class.forName(className, true, pathClassLoader);
-                    final Method aClassMethod = aClass.getMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
-                    aClassMethod.invoke(aClass.newInstance(), param);
-                } catch (Exception e) {
-                    LogUtil.e("反射M ainModule 失败："+e.getMessage());
-                }
-                 */
             }
             else {
                 Log.w(TAG, String.format("can not find pkg %s, pm path return empty", pluginPkgName));
