@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -93,8 +94,12 @@ public class XpLoader implements IXposedHookLoadPackage {
                     final Class<?> aClass = Class.forName(classNameEntry, true, pathClassLoader);
                     final Method aClassMethod = aClass.getMethod("handleLoadPackage", XC_LoadPackage.LoadPackageParam.class);
                     aClassMethod.invoke(aClass.newInstance(), lpparam);
+                } catch (InvocationTargetException e) {
+                    Throwable e2 = e.getCause();
+                    Log.e(TAG, String.format("load %s classNameEntry %s get InvocationTargetException msg %s", path, classNameEntry, e2.getMessage()));
+                    Log.e(TAG, Log.getStackTraceString(e2));
                 } catch (Exception e) {
-                    Log.e(TAG, String.format("load %s error msg %s", path, e.getMessage()));
+                    Log.e(TAG, String.format("load %s classNameEntry %s error msg %s", path, classNameEntry, e.getMessage()));
                     Log.e(TAG, Log.getStackTraceString(e));
                 }
             }
