@@ -88,7 +88,9 @@ public class XpLoader implements IXposedHookLoadPackage {
                 }
                 //通过PathClassLoader 加载apk
                 classNameEntry = classNameEntry.trim();
-                final PathClassLoader pathClassLoader = new PathClassLoader(path, ClassLoader.getSystemClassLoader());
+                ClassLoader loader = XposedBridge.BOOTCLASSLOADER;
+                //ClassLoader.getSystemClassLoader()
+                final PathClassLoader pathClassLoader = new PathClassLoader(path, loader);
                 try {
                     //反射调用插件的handleLoadPackage方法
                     final Class<?> aClass = Class.forName(classNameEntry, true, pathClassLoader);
