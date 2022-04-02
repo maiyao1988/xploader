@@ -32,14 +32,14 @@ import java.util.zip.ZipInputStream;
 
 import dalvik.system.DexFile;
 import dalvik.system.PathClassLoader;
-import de.robv.android.xposed.IXposedHookLoadPackage;
-import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
-import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import de.robv.android.tmpd.IXposedHookLoadPackage;
+import de.robv.android.tmpd.XC_MethodHook;
+import de.robv.android.tmpd.XposedBridge;
+import de.robv.android.tmpd.XposedHelpers;
+import de.robv.android.tmpd.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.tmpd.XposedHelpers.findAndHookConstructor;
+import static de.robv.android.tmpd.XposedHelpers.findAndHookMethod;
 
 /**
  * Created by maiyao on 2018/6/13.
